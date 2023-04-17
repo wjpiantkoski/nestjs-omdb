@@ -14,7 +14,7 @@ export class MoviesController {
       return []
     }
 
-    return this.omdbService.getMovies(query.title)
+    return this.omdbService.getMovie(query.title)
   }
 
 }

@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import { OmdbMovieDto } from "./dtos/omdb-movie.dto";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
@@ -17,7 +16,11 @@ export class OmdbService {
     this.apiKey = configService.get<string>('OMDB_API_KEY')
   }
 
-  async getMovies(title: string) {
+  async getMovie(title: string) {
+    if (!title) {
+      return null
+    }
+
     const url = `${this.apiBase}?apikey=${this.apiKey}&t=${title}`;
     const { data } = await this.httpService.axiosRef.get(url);
 
