@@ -39,4 +39,7 @@ export class MoviesService {
     return { totalItems, items }
   }
 
+  async removeFavoriteMovie(imdbID: string) {
+    await this.repository.delete({ imdbID })
+  }
 }
