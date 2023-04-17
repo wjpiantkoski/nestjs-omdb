@@ -11,12 +11,17 @@ export class MoviesService {
   constructor(@InjectRepository(FavoriteMovie) private repository: Repository<FavoriteMovie>) {
   }
 
-  findOneByImdbId(imdbID: string) {
-    return this.repository.findOneBy({ imdbID })
+  findOne(imdbID: string, userId: string) {
+    return this.repository
+      .createQueryBuilder()
+      .innerJoin('user', 'user')
+      .where('user.id = :userId', { userId })
+      .andWhere('imdbID = :imdbID', { imdbID })
+      .getRawOne()
   }
 
   async createFavoriteMovie(data: CreateFavoriteDto, user: User) {
-    const foundFavoriteMovie = await this.findOneByImdbId(data.imdbID)
+    const foundFavoriteMovie = await this.findOne(data.imdbID, user.id)
 
     if (foundFavoriteMovie) {
       return foundFavoriteMovie
@@ -30,26 +35,13 @@ export class MoviesService {
   }
 
   async findAll(userId: string, skip: number, limit: number) {
-    // const [totalItems, items] = await Promise.all([
-    //   this.repository.count({
-    //     where: {
-    //       user: userId
-    //     }
-    //   }),
-    //   this.repository.find({
-    //     skip,
-    //     take: limit,
-    //     order: { Title: 1 }
-    //   })
-    // ])
-
     const [totalItems, items] = await Promise.all([
-
       this.repository
         .createQueryBuilder()
         .innerJoin('user', 'user')
         .where('user.id = :userId', { userId })
         .getCount(),
+
       this.repository
         .createQueryBuilder()
         .select(
@@ -70,7 +62,10 @@ export class MoviesService {
     return { totalItems, items }
   }
 
-  async removeFavoriteMovie(imdbID: string) {
-    await this.repository.delete({ imdbID })
+  async removeFavoriteMovie(imdbID: string, userId: string) {
+    await this.repository.query(
+      'DELETE FROM favorite_movie as movie WHERE movie.userId = ? AND movie.imdbID = ?',
+      [userId, imdbID]
+    )
   }
 }

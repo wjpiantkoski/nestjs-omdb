@@ -5,7 +5,7 @@ import { User } from "../../users/entities/user";
 export class FavoriteMovie {
 
   @PrimaryGeneratedColumn('uuid')
-  id: ObjectId
+  id: string
 
   @Column({ unique: true })
   imdbID: string

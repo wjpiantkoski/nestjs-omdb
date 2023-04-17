@@ -44,14 +44,16 @@ export class MoviesController {
   }
 
   @Get('/favorites/:imdbID')
-  async checkFavoriteMovie(@Param('imdbID') imdbID: string) {
-    const favoriteMovie = await this.moviesService.findOneByImdbId(imdbID)
+  async checkFavoriteMovie(@Req() request: Request, @Param('imdbID') imdbID: string) {
+    const user = request['user']
+    const favoriteMovie = await this.moviesService.findOne(imdbID, user.id)
 
     return { isFavorite: !!favoriteMovie }
   }
 
   @Delete('/favorites/:imdbID')
-  removeFavoriteMovie(@Param('imdbID') imdbID: string) {
-    return this.moviesService.removeFavoriteMovie(imdbID)
+  removeFavoriteMovie(@Req() request: Request, @Param('imdbID') imdbID: string) {
+    const user = request['user']
+    return this.moviesService.removeFavoriteMovie(imdbID, user.id)
   }
 }

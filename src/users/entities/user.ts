@@ -5,7 +5,7 @@ import { FavoriteMovie } from "../../movies/entities/favorite-movie";
 export class User {
 
   @PrimaryGeneratedColumn('uuid')
-  id: ObjectId
+  id: string
 
   @Column({ unique: true, nullable: false })
   email: string

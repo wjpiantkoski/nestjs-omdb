@@ -4,7 +4,6 @@ import { AppService } from "./app.service";
 import { OmdbModule } from "./omdb/omdb.module";
 import { MoviesModule } from "./movies/movies.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { MongooseModule } from "@nestjs/mongoose";
 import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteMovie } from "./movies/entities/favorite-movie";
