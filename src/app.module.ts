@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteMovie } from "./movies/entities/favorite-movie";
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { FavoriteMovie } from "./movies/entities/favorite-movie";
       }
     }),
     OmdbModule,
-    MoviesModule
+    MoviesModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [
