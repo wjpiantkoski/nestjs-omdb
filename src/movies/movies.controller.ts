@@ -1,11 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { SearchMoviesDto } from "./dtos/search-movies.dto";
 import { OmdbService } from "../omdb/omdb.service";
 import { CreateFavoriteDto } from "./dtos/create-favorite.dto";
 import { MoviesService } from "./movies.service";
 import { ListFavoritesDto } from "./dtos/list-favorites.dto";
+import { AuthGuard } from "../users/guards/auth.guard";
 
 @Controller('movies')
+@UseGuards(AuthGuard)
 export class MoviesController {
 
   constructor(

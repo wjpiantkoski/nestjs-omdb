@@ -4,6 +4,7 @@ import { MoviesService } from './movies.service';
 import { OmdbModule } from "../omdb/omdb.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
+import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { FavoriteMovie } from "./entities/favorite-movie";
     MoviesController
   ],
   providers: [
-    MoviesService
+    MoviesService,
+    JwtService
   ]
 })
 export class MoviesModule {}
