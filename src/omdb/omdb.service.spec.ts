@@ -26,7 +26,12 @@ describe('OmdbService', () => {
   });
 
   it('should return a movie', async () => {
-    const movie = await service.getMovies('test')
-    // expect(movie).toBeDefined()
+    const movie = await service.getMovie('test')
+    expect(movie).toBeDefined()
+  })
+
+  it('should return null when no title is empty', async () => {
+    const movie = await service.getMovie('')
+    expect(movie).toBeFalsy()
   })
 });
