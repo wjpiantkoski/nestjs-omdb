@@ -6,6 +6,7 @@ import { MoviesModule } from './movies/movies.module';
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { APP_PIPE } from "@nestjs/core";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 @Module({
   imports: [
@@ -13,14 +14,26 @@ import { APP_PIPE } from "@nestjs/core";
       isGlobal: true,
       envFilePath: ['.env', `.env.${process.env.NODE_ENV}`]
     }),
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
-          uri: `mongodb://${config.get<string>('DB_HOST')}/${config.get<string>('DB_NAME')}`
+          type: 'mongodb',
+          host: config.get<string>('DB_HOST'),
+          database: config.get<string>('DB_NAME'),
+          entities: [],
+          synchronize: true
         }
       }
     }),
+    // MongooseModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => {
+    //     return {
+    //       uri: `mongodb://${config.get<string>('DB_HOST')}/${config.get<string>('DB_NAME')}`
+    //     }
+    //   }
+    // }),
     OmdbModule,
     MoviesModule
   ],

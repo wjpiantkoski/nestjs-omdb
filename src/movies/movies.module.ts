@@ -7,13 +7,7 @@ import { FavoriteMovie, FavoriteMovieSchema } from "./schemas/favorite-movie.sch
 
 @Module({
   imports: [
-    OmdbModule,
-    MongooseModule.forFeature([
-      {
-        name: FavoriteMovie.name,
-        schema: FavoriteMovieSchema
-      }
-    ])
+    OmdbModule
   ],
   controllers: [
     MoviesController
