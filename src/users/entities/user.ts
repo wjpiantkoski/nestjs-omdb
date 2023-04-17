@@ -1,4 +1,5 @@
-import { Column, Entity, ObjectId, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ObjectId, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { FavoriteMovie } from "../../movies/entities/favorite-movie";
 
 @Entity()
 export class User {
@@ -11,4 +12,10 @@ export class User {
 
   @Column({ nullable: false })
   password: string
+
+  @OneToMany(
+    () => FavoriteMovie,
+    report => report.user
+  )
+  favoriteMovies: FavoriteMovie[]
 }
