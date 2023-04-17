@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { FavoriteMovie } from "./movies/entities/favorite-movie";
 
 @Module({
   imports: [
@@ -21,19 +22,13 @@ import { TypeOrmModule } from "@nestjs/typeorm";
           type: 'mongodb',
           host: config.get<string>('DB_HOST'),
           database: config.get<string>('DB_NAME'),
-          entities: [],
+          entities: [
+            FavoriteMovie
+          ],
           synchronize: true
         }
       }
     }),
-    // MongooseModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (config: ConfigService) => {
-    //     return {
-    //       uri: `mongodb://${config.get<string>('DB_HOST')}/${config.get<string>('DB_NAME')}`
-    //     }
-    //   }
-    // }),
     OmdbModule,
     MoviesModule
   ],
