@@ -8,6 +8,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteMovie } from "./movies/entities/favorite-movie";
+import { UsersModule } from './users/users.module';
+import { User } from "./users/entities/user";
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { FavoriteMovie } from "./movies/entities/favorite-movie";
           host: config.get<string>('DB_HOST'),
           database: config.get<string>('DB_NAME'),
           entities: [
+            User,
             FavoriteMovie
           ],
           synchronize: true
@@ -30,7 +33,8 @@ import { FavoriteMovie } from "./movies/entities/favorite-movie";
       }
     }),
     OmdbModule,
-    MoviesModule
+    MoviesModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [
