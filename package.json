@@ -34,6 +34,7 @@
     "cross-env": "^7.0.3",
     "lodash": "^4.17.21",
     "mongoose": "^7.0.3",
+    "mysql2": "^3.2.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "sqlite3": "^5.1.6",
