@@ -1,9 +1,9 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectId, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class FavoriteMovie {
 
-  @ObjectIdColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: ObjectId
 
   @Column({ unique: true })
