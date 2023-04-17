@@ -26,4 +26,17 @@ export class MoviesService {
     return this.repository.save(favoriteMovie)
   }
 
+  async findAll(skip: number, limit: number) {
+    const [totalItems, items] = await Promise.all([
+      this.repository.count(),
+      this.repository.find({
+        skip,
+        take: limit,
+        order: { Title: 1 }
+      })
+    ])
+
+    return { totalItems, items }
+  }
+
 }
