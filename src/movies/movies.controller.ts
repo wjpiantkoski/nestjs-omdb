@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { SearchMoviesDto } from "./dtos/search-movies.dto";
 import { OmdbService } from "../omdb/omdb.service";
 import { CreateFavoriteDto } from "./dtos/create-favorite.dto";
@@ -35,7 +35,14 @@ export class MoviesController {
   }
 
   @Post('/favorites')
-  async addFavoriteMovie(@Body() body: CreateFavoriteDto) {
+  addFavoriteMovie(@Body() body: CreateFavoriteDto) {
     return this.moviesService.createFavoriteMovie(body)
+  }
+
+  @Get('/favorites/:imdbID')
+  async checkFavoriteMovie(@Param('imdbID') imdbID: string) {
+    const favoriteMovie = await this.moviesService.findOneByImdbId(imdbID)
+
+    return { isFavorite: !!favoriteMovie }
   }
 }
