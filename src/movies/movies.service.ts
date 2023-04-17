@@ -3,6 +3,7 @@ import { CreateFavoriteDto } from "./dtos/create-favorite.dto";
 import { Repository } from "typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
 import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "../users/entities/user";
 
 @Injectable()
 export class MoviesService {
@@ -10,12 +11,17 @@ export class MoviesService {
   constructor(@InjectRepository(FavoriteMovie) private repository: Repository<FavoriteMovie>) {
   }
 
-  findOneByImdbId(imdbID: string) {
-    return this.repository.findOneBy({ imdbID })
+  findOne(imdbID: string, userId: string) {
+    return this.repository
+      .createQueryBuilder()
+      .innerJoin('user', 'user')
+      .where('user.id = :userId', { userId })
+      .andWhere('imdbID = :imdbID', { imdbID })
+      .getRawOne()
   }
 
-  async createFavoriteMovie(data: CreateFavoriteDto) {
-    const foundFavoriteMovie = await this.findOneByImdbId(data.imdbID)
+  async createFavoriteMovie(data: CreateFavoriteDto, user: User) {
+    const foundFavoriteMovie = await this.findOne(data.imdbID, user.id)
 
     if (foundFavoriteMovie) {
       return foundFavoriteMovie
@@ -23,23 +29,43 @@ export class MoviesService {
 
     const favoriteMovie = this.repository.create(data)
 
+    favoriteMovie.user = user
+
     return this.repository.save(favoriteMovie)
   }
 
-  async findAll(skip: number, limit: number) {
+  async findAll(userId: string, skip: number, limit: number) {
     const [totalItems, items] = await Promise.all([
-      this.repository.count(),
-      this.repository.find({
-        skip,
-        take: limit,
-        order: { Title: 1 }
-      })
+      this.repository
+        .createQueryBuilder()
+        .innerJoin('user', 'user')
+        .where('user.id = :userId', { userId })
+        .getCount(),
+
+      this.repository
+        .createQueryBuilder()
+        .select(
+          [
+            'Title',
+            'Actors',
+            'Plot',
+            'Poster',
+            'imdbID',
+            'user.id as userId'
+          ]
+        )
+        .innerJoin('user', 'user')
+        .where('user.id = :userId', { userId })
+        .getRawMany()
     ])
 
     return { totalItems, items }
   }
 
-  async removeFavoriteMovie(imdbID: string) {
-    await this.repository.delete({ imdbID })
+  async removeFavoriteMovie(imdbID: string, userId: string) {
+    await this.repository.query(
+      'DELETE FROM favorite_movie as movie WHERE movie.userId = ? AND movie.imdbID = ?',
+      [userId, imdbID]
+    )
   }
 }

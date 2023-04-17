@@ -1,10 +1,11 @@
-import { Column, Entity, ObjectId, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, ObjectId, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../../users/entities/user";
 
 @Entity()
 export class FavoriteMovie {
 
   @PrimaryGeneratedColumn('uuid')
-  id: ObjectId
+  id: string
 
   @Column({ unique: true })
   imdbID: string
@@ -20,4 +21,10 @@ export class FavoriteMovie {
 
   @Column()
   Actors: string
+
+  @ManyToOne(
+    () => User,
+    user => user.favoriteMovies
+  )
+  user: User
 }
