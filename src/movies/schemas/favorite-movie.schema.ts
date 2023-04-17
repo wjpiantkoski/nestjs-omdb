@@ -20,6 +20,9 @@ export class FavoriteMovie {
 
   @Prop({ required: true })
   Poster: string
+
+  @Prop({ required: true })
+  Actors: string
 }
 
 export const FavoriteMovieSchema = SchemaFactory.createForClass(FavoriteMovie)
