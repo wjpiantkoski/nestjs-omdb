@@ -1,7 +1,6 @@
 import { Module, ValidationPipe } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { OmdbModule } from "./omdb/omdb.module";
 import { MoviesModule } from "./movies/movies.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_PIPE } from "@nestjs/core";
@@ -30,7 +29,6 @@ import { User } from "./users/entities/user";
         }
       }
     }),
-    OmdbModule,
     MoviesModule,
     UsersModule
   ],

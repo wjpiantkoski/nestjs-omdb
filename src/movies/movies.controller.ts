@@ -12,10 +12,8 @@ import {Request} from "express";
 export class MoviesController {
 
   constructor(
-    private omdbService: OmdbService,
     private moviesService: MoviesService
-  ) {
-  }
+  ) {}
 
   @Get()
   async getMovies(@Query() query: SearchMoviesDto) {
@@ -23,7 +21,7 @@ export class MoviesController {
       return []
     }
 
-    return this.omdbService.getMovie(query.title)
+    return this.moviesService.getMovieFromOmdb(query.title)
   }
 
   @Get('/favorites')
