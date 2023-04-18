@@ -5,6 +5,7 @@ import { User } from "./entities/user";
 import mock = jest.mock;
 import * as mongoose from "mongoose";
 import { BadRequestException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -49,6 +50,7 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
+        JwtService,
         {
           provide: getRepositoryToken(User),
           useValue: mockUsersRepository
@@ -72,7 +74,7 @@ describe('UsersService', () => {
     const user = await service.createUser(userData.email, userData.password)
 
     expect(user).toBeDefined()
-    expect(mongoose.isValidObjectId(user.id)).toBeTruthy()
+    expect(user.email).toEqual(userData.email)
   })
 
   it('should throw BadRequestError when signup with used e-mail', async () => {
