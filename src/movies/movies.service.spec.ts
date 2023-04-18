@@ -4,8 +4,17 @@ import {getRepositoryToken} from "@nestjs/typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
 import * as mongoose from 'mongoose'
 import { User } from "../users/entities/user";
+import { ConfigService } from "@nestjs/config";
+import { HttpService } from "@nestjs/axios";
+import axios, { AxiosStatic } from "axios";
+import * as process from "process";
+
+import { config as dotenvConfig } from 'dotenv'
+import { JwtService } from "@nestjs/jwt";
 
 describe('MoviesService', () => {
+  dotenvConfig()
+
   let user = {
     id: '01bff1d7-9072-4e69-949b-9724c84cd380'
   }
@@ -21,8 +30,30 @@ describe('MoviesService', () => {
   let service: MoviesService
   let mockFavoriteMovieRepository
 
+  let mockConfigService: {}
+
+  let mockHttpService: {
+    readonly axiosRef:  | AxiosStatic;
+    readonly instance: AxiosStatic | AxiosStatic
+  }
+
   beforeEach(async () => {
     const favoriteMovies = []
+
+    mockConfigService = {
+      get(key) {
+        return process.env[key]
+      }
+    }
+
+    mockHttpService = {
+      get axiosRef() {
+        return axios
+      },
+      get instance() {
+        return axios
+      },
+    }
 
     mockFavoriteMovieRepository = {
       findOneBy: (query: any) => {
@@ -69,8 +100,16 @@ describe('MoviesService', () => {
       providers: [
         MoviesService,
         {
+          provide: ConfigService,
+          useValue: mockConfigService
+        },
+        {
           provide: getRepositoryToken(FavoriteMovie),
           useValue: mockFavoriteMovieRepository
+        },
+        {
+          provide: HttpService,
+          useValue: mockHttpService
         }
       ],
     }).compile();
@@ -83,6 +122,11 @@ describe('MoviesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should get a movie from omdb', async () => {
+    const movie = await service.getMovieFromOmdb('test')
+    expect(movie).toBeDefined()
+  })
 
   it("should create a favorite movie", async () => {
     const movie = {
