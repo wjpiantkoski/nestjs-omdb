@@ -4,15 +4,22 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "./entities/user";
 import mock = jest.mock;
 import * as mongoose from "mongoose";
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 describe('UsersService', () => {
   let service: UsersService;
   let mockUsersRepository
+  let mockJwtService
 
   beforeEach(async () => {
     const users = []
+
+    mockJwtService = {
+      signAsync: () => {
+        return 'mocked_access_token'
+      }
+    }
 
     mockUsersRepository = {
       findOneBy: (query: any) => {
@@ -50,10 +57,13 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        JwtService,
         {
           provide: getRepositoryToken(User),
           useValue: mockUsersRepository
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService
         }
       ],
     }).compile();
@@ -88,5 +98,25 @@ describe('UsersService', () => {
     await expect(
       service.createUser(userData.email, userData.password)
     ).rejects.toThrow(BadRequestException)
+  })
+
+  it('should sign in user', async () => {
+    const userData = {
+      email: 'any-email@email.com',
+      password: 'any-password'
+    }
+
+    await service.createUser(userData.email, userData.password)
+
+    const user = await service.signIn(userData.email, userData.password)
+
+    expect(user).toBeDefined()
+    expect(user['access_token']).toBeDefined()
+  })
+
+  it('should throw UnauthorizedException when sign with invalid user', async () => {
+    await expect(
+      service.signIn('any@email.com', 'any-password')
+    ).rejects.toThrow(UnauthorizedException)
   })
 });
