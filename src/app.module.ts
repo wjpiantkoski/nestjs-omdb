@@ -20,10 +20,10 @@ import { User } from "./users/entities/user";
       useFactory: (config: ConfigService) => {
         return {
           type: 'mysql',
-          host: config.get<string>('DB_HOST'),
-          username: config.get<string>('DB_USERNAME'),
-          password: config.get<string>('DB_PASSWORD'),
-          database: config.get<string>('DB_NAME'),
+          host: config.get<string>('MYSQL_HOST'),
+          username: config.get<string>('MYSQL_USER'),
+          password: config.get<string>('MYSQL_PASSWORD'),
+          database: config.get<string>('MYSQL_DATABASE'),
           entities: [User, FavoriteMovie],
           synchronize: true
         }
