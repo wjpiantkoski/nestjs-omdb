@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, ObjectId, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, ObjectId, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/entities/user";
 
 @Entity()
@@ -26,5 +26,6 @@ export class FavoriteMovie {
     () => User,
     user => user.favoriteMovies
   )
+  @JoinColumn()
   user: User
 }
