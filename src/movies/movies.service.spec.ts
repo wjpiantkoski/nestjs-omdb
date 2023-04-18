@@ -10,7 +10,6 @@ import axios, { AxiosStatic } from "axios";
 import * as process from "process";
 
 import { config as dotenvConfig } from 'dotenv'
-import { JwtService } from "@nestjs/jwt";
 
 describe('MoviesService', () => {
   dotenvConfig()

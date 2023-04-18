@@ -11,6 +11,7 @@ describe('UsersService', () => {
   let service: UsersService;
   let mockUsersRepository
   let mockJwtService
+  let mockConfigService
 
   beforeEach(async () => {
     const users = []

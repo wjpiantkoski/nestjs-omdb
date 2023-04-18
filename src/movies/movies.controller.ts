@@ -15,9 +15,9 @@ export class MoviesController {
   ) {}
 
   @Get()
-  async getMovies(@Query() query: SearchMoviesDto) {
+  async getMovie(@Query() query: SearchMoviesDto) {
     if (!query.title) {
-      return []
+      return {}
     }
 
     return this.moviesService.getMovieFromOmdb(query.title)
