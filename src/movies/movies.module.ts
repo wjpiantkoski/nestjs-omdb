@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
-import { OmdbModule } from "../omdb/omdb.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
 import { JwtService } from "@nestjs/jwt";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
-    OmdbModule,
+    HttpModule,
     TypeOrmModule.forFeature([FavoriteMovie])
   ],
   controllers: [

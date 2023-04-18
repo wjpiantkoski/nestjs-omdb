@@ -4,11 +4,33 @@ import { Repository } from "typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../users/entities/user";
+import { ConfigService } from "@nestjs/config";
+import { HttpService } from "@nestjs/axios";
 
 @Injectable()
 export class MoviesService {
 
-  constructor(@InjectRepository(FavoriteMovie) private repository: Repository<FavoriteMovie>) {
+  constructor(
+    @InjectRepository(FavoriteMovie) private repository: Repository<FavoriteMovie>,
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService
+  ) {}
+
+  async getMovieFromOmdb(title: string) {
+    if (!title) {
+      return null
+    }
+
+    const url = `${this.configService.get<string>('OMDB_API_BASE')}?apikey=${this.configService.get<string>('OMDB_API_KEY')}&t=${title}`;
+    const { data } = await this.httpService.axiosRef.get(url);
+
+    return {
+      imdbID: data.imdbID,
+      Title: data.Title,
+      Actors: data.Actors,
+      Plot: data.Plot,
+      Poster: data.Poster
+    };
   }
 
   findOne(imdbID: string, userId: string) {

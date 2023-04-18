@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { SearchMoviesDto } from "./dtos/search-movies.dto";
-import { OmdbService } from "../omdb/omdb.service";
 import { CreateFavoriteDto } from "./dtos/create-favorite.dto";
 import { MoviesService } from "./movies.service";
 import { ListFavoritesDto } from "./dtos/list-favorites.dto";
@@ -12,18 +11,16 @@ import {Request} from "express";
 export class MoviesController {
 
   constructor(
-    private omdbService: OmdbService,
     private moviesService: MoviesService
-  ) {
-  }
+  ) {}
 
   @Get()
-  async getMovies(@Query() query: SearchMoviesDto) {
+  async getMovie(@Query() query: SearchMoviesDto) {
     if (!query.title) {
-      return []
+      return {}
     }
 
-    return this.omdbService.getMovie(query.title)
+    return this.moviesService.getMovieFromOmdb(query.title)
   }
 
   @Get('/favorites')
