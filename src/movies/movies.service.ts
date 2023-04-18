@@ -12,60 +12,44 @@ export class MoviesService {
   }
 
   findOne(imdbID: string, userId: string) {
-    return this.repository
-      .createQueryBuilder()
-      .innerJoin('user', 'user')
-      .where('user.id = :userId', { userId })
-      .andWhere('imdbID = :imdbID', { imdbID })
-      .getRawOne()
+    return this.repository.findOneBy({
+      imdbID,
+      user: { id: userId }
+    });
   }
 
   async createFavoriteMovie(data: CreateFavoriteDto, user: User) {
-    const foundFavoriteMovie = await this.findOne(data.imdbID, user.id)
+    const foundFavoriteMovie = await this.findOne(data.imdbID, user.id);
 
     if (foundFavoriteMovie) {
-      return foundFavoriteMovie
+      return foundFavoriteMovie;
     }
 
-    const favoriteMovie = this.repository.create(data)
+    const favoriteMovie = this.repository.create(data);
 
-    favoriteMovie.user = user
+    favoriteMovie.user = user;
+    await this.repository.save(favoriteMovie);
 
-    return this.repository.save(favoriteMovie)
+    return this.findOne(favoriteMovie.imdbID, user.id);
   }
 
   async findAll(userId: string, skip: number, limit: number) {
     const [totalItems, items] = await Promise.all([
-      this.repository
-        .createQueryBuilder()
-        .innerJoin('user', 'user')
-        .where('user.id = :userId', { userId })
-        .getCount(),
+      this.repository.countBy({ user: { id: userId } }),
+      this.repository.find({
+        skip,
+        take: limit,
+        where: { user: { id: userId } },
+      })
+    ]);
 
-      this.repository
-        .createQueryBuilder()
-        .select(
-          [
-            'Title',
-            'Actors',
-            'Plot',
-            'Poster',
-            'imdbID',
-            'user.id as userId'
-          ]
-        )
-        .innerJoin('user', 'user')
-        .where('user.id = :userId', { userId })
-        .getRawMany()
-    ])
-
-    return { totalItems, items }
+    return { totalItems, items };
   }
 
   async removeFavoriteMovie(imdbID: string, userId: string) {
-    await this.repository.query(
-      'DELETE FROM favorite_movie as movie WHERE movie.userId = ? AND movie.imdbID = ?',
-      [userId, imdbID]
-    )
+    await this.repository.delete({
+      imdbID,
+      user: { id: userId }
+    })
   }
 }

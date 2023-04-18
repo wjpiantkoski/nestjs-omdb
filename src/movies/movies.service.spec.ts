@@ -3,9 +3,13 @@ import { MoviesService } from './movies.service';
 import {getRepositoryToken} from "@nestjs/typeorm";
 import { FavoriteMovie } from "./entities/favorite-movie";
 import * as mongoose from 'mongoose'
-import { CreateFavoriteDto } from "./dtos/create-favorite.dto";
+import { User } from "../users/entities/user";
 
 describe('MoviesService', () => {
+  let user = {
+    id: '01bff1d7-9072-4e69-949b-9724c84cd380'
+  }
+
   let movie = {
     "imdbID": "tt2407380",
     "Title": "Test",
@@ -22,14 +26,8 @@ describe('MoviesService', () => {
 
     mockFavoriteMovieRepository = {
       findOneBy: (query: any) => {
-        const queryKeys = Object.keys(query)
-
         const foundMovie = favoriteMovies.find(movie => {
-          const matchedKeys = queryKeys.filter(key => {
-            return movie[key] === query[key]
-          })
-
-          return matchedKeys.length === queryKeys.length
+          return movie.imdbID === query.imdbID && movie.userId === query.userId
         })
 
         return foundMovie || null
@@ -51,20 +49,14 @@ describe('MoviesService', () => {
           ...data
         }
       },
-      count: () => favoriteMovies.length,
+      countBy: () => favoriteMovies.length,
       find: (options: any) => {
         const {skip, take} = options
         return favoriteMovies.slice(skip, (skip + take))
       },
       delete: (query: any) => {
-        const queryKeys = Object.keys(query)
-
         const movieIndex = favoriteMovies.findIndex(movie => {
-          const matchedKeys = queryKeys.filter(key => {
-            return movie[key] === query[key]
-          })
-
-          return matchedKeys.length === queryKeys.length
+          return movie.imdbID === query.imdbID && movie.userId === query.userId
         })
 
         if (movieIndex > -1) {
@@ -85,7 +77,7 @@ describe('MoviesService', () => {
 
     service = module.get<MoviesService>(MoviesService);
 
-    await service.createFavoriteMovie(movie)
+    await service.createFavoriteMovie(movie, user as User)
   });
 
   it('should be defined', () => {
@@ -101,10 +93,10 @@ describe('MoviesService', () => {
       "Actors": "Scott Marlowe, Matthew Risch, Evan Boomer"
     }
 
-    const favoriteMovie = await service.createFavoriteMovie(movie)
+    const favoriteMovie = await service.createFavoriteMovie(movie, user as User)
 
     expect(favoriteMovie).toBeDefined()
-    expect(mongoose.isValidObjectId(favoriteMovie.id)).toBeTruthy()
+    expect(favoriteMovie.imdbID).toEqual(movie.imdbID)
   });
 
   it("should not create a repeated favorite movie", async () => {
@@ -116,27 +108,27 @@ describe('MoviesService', () => {
       "Actors": "Scott Marlowe, Matthew Risch, Evan Boomer"
     }
 
-    const favoriteMovie = await service.createFavoriteMovie(movie)
+    const favoriteMovie = await service.createFavoriteMovie(movie, user as User)
     expect(favoriteMovie).toBeDefined()
 
-    const anotherFavoriteMovie = await service.createFavoriteMovie(movie)
+    const anotherFavoriteMovie = await service.createFavoriteMovie(movie, user as User)
     expect(anotherFavoriteMovie.id).toEqual(favoriteMovie.id)
   });
 
   it('should find a movie by imdbID', async () => {
-    const foundMovie = await service.findOneByImdbId(movie.imdbID)
+    const foundMovie = await service.findOne(movie.imdbID, user.id)
 
     expect(foundMovie).toBeDefined()
     expect(foundMovie.imdbID).toEqual(movie.imdbID)
   })
 
   it('should return null when not found a movie by imdbID', async () => {
-    const foundMovie = await service.findOneByImdbId('tt2407381')
+    const foundMovie = await service.findOne('tt2407381', user.id)
     expect(foundMovie).toEqual(null)
   })
 
   it('should list favorite movies', async () => {
-    const {totalItems, items} = await service.findAll(0, 10)
+    const {totalItems, items} = await service.findAll(user.id,0, 10)
 
     expect(totalItems).toEqual(1)
     expect(items.length).toEqual(1)
@@ -144,9 +136,9 @@ describe('MoviesService', () => {
   })
 
   it('should remove a movie from favorites', async () => {
-    await service.removeFavoriteMovie(movie.imdbID)
+    await service.removeFavoriteMovie(movie.imdbID, user.id)
 
-    const {totalItems, items} = await service.findAll(0, 10)
+    const {totalItems, items} = await service.findAll(user.id, 0, 10)
 
     expect(totalItems).toEqual(0)
     expect(items.length).toEqual(0)
