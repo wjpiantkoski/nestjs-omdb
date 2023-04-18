@@ -14,6 +14,10 @@ export class UsersService {
   ) {
   }
 
+  findOne(email: string) {
+    return this.repository.findOneBy({ email });
+  }
+
   async createUser(email: string, password: string) {
     const foundUser = await this.repository.findOneBy({ email });
 
@@ -34,7 +38,7 @@ export class UsersService {
   }
 
   async signIn(email: string, password: string) {
-    const user = await this.repository.findOneBy({ email });
+    const user = await this.findOne(email)
 
     if (!user) {
       throw new UnauthorizedException();
